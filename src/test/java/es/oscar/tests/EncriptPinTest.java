@@ -1,24 +1,15 @@
 package es.oscar.tests;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
-import java.security.Security;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.encodings.OAEPEncoding;
-import org.bouncycastle.crypto.engines.RSAEngine;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import es.everis.tests.Encriptor;
 
 public class EncriptPinTest {
 	private static final String TPIN = "412456000000";
@@ -28,29 +19,10 @@ public class EncriptPinTest {
 
 	@Test
 	public void encriptTest() throws InvalidCipherTextException, IOException, CertificateException, NoSuchProviderException{
-		String encriptedTPin = encrypt(PUBLIC_KEY, TPIN);
+		String encriptedTPin = Encriptor.encriptWithPublicKey(TPIN, PUBLIC_KEY);
 		LOGGER.info(encriptedTPin);
 	}
 	
-	private String encrypt (String key, String inputData) throws IOException, InvalidCipherTextException, CertificateException, NoSuchProviderException{
 
-        String encryptedData = null;
-
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        
-        X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(Hex.decode(key)));
-        
-
-        AsymmetricKeyParameter param = PublicKeyFactory.createKey(cert.getPublicKey().getEncoded());
-        
-        AsymmetricBlockCipher cipher = new OAEPEncoding(new RSAEngine(), new SHA256Digest());
-        cipher.init(true, param);
-        
-        byte[] messageBytes = inputData.getBytes();
-        byte[] cipheredBytes = cipher.processBlock(messageBytes, 0, messageBytes.length);
-
-        encryptedData = Hex.toHexString(cipheredBytes);
-
-        return encryptedData;
-    }
 }
+
